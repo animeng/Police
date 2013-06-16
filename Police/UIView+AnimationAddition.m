@@ -56,7 +56,7 @@
     [animationRotation setFromValue:[NSNumber numberWithFloat:0]];
     [animationRotation setToValue:[NSNumber numberWithFloat:angle]];
     [animationRotation setDuration:0.25];
-    [animationRotation setTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
+    [animationRotation setTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear]];
     return animationRotation;
 }
 
@@ -65,7 +65,6 @@
     CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
     [animation setFromValue:[NSNumber numberWithFloat:start]];
     animation.toValue = [NSNumber numberWithFloat:end];
-    
     [animation setDuration:0.25];
     [animation setTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
     return animation;

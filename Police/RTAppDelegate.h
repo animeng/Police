@@ -8,13 +8,16 @@
 
 #import <UIKit/UIKit.h>
 #import "BMapKit.h"
+#import "RTFirstViewController.h"
 
-@interface RTAppDelegate : UIResponder <UIApplicationDelegate, UITabBarControllerDelegate>
+@interface RTAppDelegate : UIResponder <UIApplicationDelegate,CLLocationManagerDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 
-@property (strong, nonatomic) UITabBarController *tabBarController;
+@property (strong, nonatomic) RTFirstViewController *viewController;
 
 @property (strong,nonatomic) BMKMapManager* mapManager;
+
+@property (nonatomic,strong) CLLocationManager * locationManager;
 
 @end

@@ -9,6 +9,7 @@
 #import "NetAction.h"
 #import "MBProgressHUD.h"
 #import "UserInfo.h"
+#import "UtilityWidget.h"
 
 @implementation NetAction
 
@@ -75,10 +76,10 @@
         [para setObject:[UserInfo shareUserInfo].message forKey:@"message"];
     }
     if ([UserInfo shareUserInfo].carLat) {
-        [para setObject:[UserInfo shareUserInfo].carLat forKey:@"lat"];
+        [para setObject:[NSNumber numberWithDouble:[UserInfo shareUserInfo].policeCoordinate2D.latitude] forKey:@"lat"];
     }
     if ([UserInfo shareUserInfo].carLng) {
-        [para setObject:[UserInfo shareUserInfo].carLng forKey:@"lng"];
+        [para setObject:[NSNumber numberWithDouble:[UserInfo shareUserInfo].policeCoordinate2D.longitude] forKey:@"lng"];
     }
     action.parameter = para;
     [action getRequestDictionaryResult:^(NSDictionary *result) {
@@ -121,7 +122,7 @@
     }];
 }
 
-+ (void)changeStatus:(void (^)(NSDictionary *reuslt))info
++ (void)changeStatus:(void (^)(NSDictionary *reuslt))info status:(NSString*)status
 {
     JMBasicAction *action = [[JMBasicAction alloc] init];
     action.basicPath = @"changeStatus";
@@ -129,15 +130,28 @@
     if ([UserInfo shareUserInfo].tid) {
         [para setObject:[UserInfo shareUserInfo].tid forKey:@"tid"];
     }
-    if ([UserInfo shareUserInfo].status) {
-        [para setObject:[UserInfo shareUserInfo].status forKey:@"status"];
+    if (status) {
+        [para setObject:status forKey:@"status"];
+    }
+    if ([UserInfo shareUserInfo].carLat) {
+        [para setObject:[UserInfo shareUserInfo].carLat forKey:@"lat"];
+    }
+    if ([UserInfo shareUserInfo].carLng) {
+        [para setObject:[UserInfo shareUserInfo].carLng forKey:@"lng"];
     }
     action.parameter = para;
     [action getRequestDictionaryResult:^(NSDictionary *result) {
+        [UserInfo shareUserInfo].status = [result objectForKey:@"status"];
         info(result);
         
     } error:^(NSError *error) {
-        
+        if (!hasOpenLadar) {
+            [UtilityWidget showNetLoadCompleteStatusBar:@"开启雷达失败"];
+        }
+        else{
+            [UtilityWidget showNetLoadCompleteStatusBar:@"关闭雷达失败"];
+
+        }
     }];
 }
 

@@ -10,6 +10,7 @@
 #import "JMClient.h"
 #import "URLDefine.h"
 #import "MBProgressHUD.h"
+#import "UtilityWidget.h"
 
 @interface JMBasicAction()
 
@@ -30,10 +31,24 @@
     return self;
 }
 
+- (BOOL)checkNetStatus
+{
+    if (self.client.networkReachabilityStatus == AFNetworkReachabilityStatusNotReachable) {
+        if (KeyWindow) {
+            [UtilityWidget showNetLoadCompleteStatusBar:@"亲！你网络有问题"];
+            return NO;
+        }
+    }
+    return YES;
+}
+
 #pragma mark - http action
 
 - (void)getRequestDictionaryResult:(SuccessInfo)info error:(ErrorInfo)errorInfo
 {
+    if (![self checkNetStatus]) {
+        return;
+    }
     JMDINFO(@"get request:%@/%@ para:%@",self.client.baseURL,self.basicPath,self.parameter);
     [self.client getPath:self.basicPath parameters:self.parameter success:^(AFHTTPRequestOperation *operation, id responseObject) {
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
@@ -54,6 +69,9 @@
 
 - (void)postRequestDictionaryResult:(SuccessInfo)info error:(ErrorInfo)errorInfo
 {
+    if (![self checkNetStatus]) {
+        return;
+    }
     JMDINFO(@"post request:%@/%@ para:%@",self.client.baseURL,self.basicPath,self.parameter);
     [self.client postPath:self.basicPath parameters:self.parameter success:^(AFHTTPRequestOperation *operation, id responseObject) {
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
@@ -76,6 +94,9 @@
 
 - (void)getRequestListResult:(SuccessAryInfo)info error:(ErrorInfo)errorInfo
 {
+    if (![self checkNetStatus]) {
+        return;
+    }
     JMDINFO(@"get request:%@/%@ para:%@",self.client.baseURL,self.basicPath,self.parameter);
     [self.client getPath:self.basicPath parameters:self.parameter success:^(AFHTTPRequestOperation *operation, id responseObject) {
         if ([responseObject isKindOfClass:[NSArray class]]) {

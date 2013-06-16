@@ -9,7 +9,7 @@
 #ifndef SaleHouse_URLDefine_h
 #define SaleHouse_URLDefine_h
 
-#define APIBaseURLString @"http://192.168.1.106:8080"
+#define APIBaseURLString @"http://tiaozilaile.com:80"
 
 typedef enum REQUEST_ERRO
 {

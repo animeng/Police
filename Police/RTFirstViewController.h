@@ -10,4 +10,10 @@
 
 @interface RTFirstViewController : UIViewController
 
+- (void)locationCurrent;
+
+- (void)locationCoordinate2D:(CLLocationCoordinate2D)coord;
+
+- (void)checkLadarStatus;
+
 @end

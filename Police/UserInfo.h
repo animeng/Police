@@ -20,6 +20,10 @@
 
 @property (nonatomic,strong) NSString *message;
 
+@property (nonatomic,assign) CLLocationCoordinate2D myCoordinate2D;
+
+@property (nonatomic,assign) CLLocationCoordinate2D policeCoordinate2D;
+
 @property (nonatomic,strong) NSNumber *carLat;
 
 @property (nonatomic,strong) NSNumber *carLng;

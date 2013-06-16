@@ -18,6 +18,6 @@
 
 + (void)getMessage:(void (^)(NSArray *reuslt))info;
 
-+ (void)changeStatus:(void (^)(NSDictionary *reuslt))info;
++ (void)changeStatus:(void (^)(NSDictionary *reuslt))info status:(NSString*)status;
 
 @end
