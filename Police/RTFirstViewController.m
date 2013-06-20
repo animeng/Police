@@ -15,10 +15,13 @@
 #import <QuartzCore/QuartzCore.h>
 #import "AlarmAnnotation.h"
 #import "MyLocationAnnotation.h"
+#import "RTMessageAdapter.h"
+#import "MaskView.h"
+#import "RTGuidViewController.h"
 
 extern Class ActionPaopaoView;
 
-@interface RTFirstViewController ()<BMKMapViewDelegate,BMKSearchDelegate>
+@interface RTFirstViewController ()<BMKMapViewDelegate,BMKSearchDelegate,RTMessageListViewControllerDelegate,RTSendMessageViewDelegate>
 
 @property (nonatomic,strong) BMKMapView *mapView;
 
@@ -38,6 +41,8 @@ extern Class ActionPaopaoView;
 
 @property (nonatomic,strong) RTSendMessageViewController *sendMessageListViewController;
 
+@property (nonatomic,strong) RTGuidViewController *guidViewController;
+
 @property (strong, nonatomic) IBOutlet UIImageView *ladarIndicator;
 
 @property (strong, nonatomic) IBOutlet UIView *bottomView;
@@ -46,6 +51,7 @@ extern Class ActionPaopaoView;
 
 @property (nonatomic,strong) BMKSearch * mapSearch;
 
+@property (strong, nonatomic) IBOutlet UIButton *messageBtn;
 @end
 
 @implementation RTFirstViewController
@@ -70,9 +76,14 @@ extern Class ActionPaopaoView;
     self.mapSearch.delegate = self;
     [self setupMapView];
     [self setupReturnBtn];
+    [self setupModifyCarBtn];
     [self setupTextView];
+    [self seupMessageList];
     self.bottomView.bottom = self.view.height;
     [self.view addSubview:self.bottomView];
+    if (self.hasGuidView) {
+        [self setupGuidView];
+    }
     [self checkLadarStatus];
 }
 
@@ -139,6 +150,17 @@ extern Class ActionPaopaoView;
     return nil;
 }
 
+- (UIButton*)findPaopaoButtonView
+{
+    for (UIView *subView in [self.purpleView subviews]) {
+        NSString *className = NSStringFromClass([subView class]);
+        if ([className isEqualToString:@"PaopaoButton"]) {
+            return (UIButton*)subView;
+        }
+    }
+    return nil;
+}
+
 - (UIView*)findCurentView
 {
     for (UIView *subView in [self.mapView subviews]) {
@@ -160,7 +182,7 @@ extern Class ActionPaopaoView;
     self.ladarIndicator.hidden = NO;
     CAAnimation *annimation = [UIView animationRotationAngle:2*M_PI];
     annimation.repeatCount = HUGE_VALF;
-    [annimation setDuration:1];
+    [annimation setDuration:4.0];
     [self.ladarIndicator.layer addAnimation:annimation forKey:@"ladarScan"];
 }
 
@@ -175,7 +197,7 @@ extern Class ActionPaopaoView;
         UIImage *policeImage = [UIImage imageNamed:@"self_icon"];
         self.policePoint = [[UIImageView alloc] initWithImage:policeImage];
         self.policePoint.size = policeImage.size;
-        self.policePoint.center = CGPointMake(KeyWindow.width/2, KeyWindow.height/2-80);
+        self.policePoint.center = CGPointMake(KeyWindow.width/2, KeyWindow.height/2-120);
     }
     if (![self.policePoint superview]) {
         [KeyWindow addSubview:self.policePoint];
@@ -217,6 +239,7 @@ extern Class ActionPaopaoView;
 - (void)addModifyStatusPoint
 {
     self.purpleView = [self findPaopaoView];
+    [self findPaopaoButtonView].enabled = NO;
     CGRect carAnnotationRectInWindow = [self.carAnnotation convertRect:self.carAnnotation.bounds toView:KeyWindow];
     CGRect purpleViewRectInWindow = [self.purpleView convertRect:self.purpleView.bounds toView:KeyWindow];
     self.purpleView.frame = purpleViewRectInWindow;
@@ -274,12 +297,80 @@ extern Class ActionPaopaoView;
     }
 }
 
+- (void)checkMessageList
+{
+    if ([UIApplication sharedApplication].applicationIconBadgeNumber ) {
+        [self.messageBtn setImage:[UIImage imageNamed:@"alarm_new_button"] forState:UIControlStateNormal];
+    }
+    else{
+        [self.messageBtn setImage:[UIImage imageNamed:@"alarm_button"] forState:UIControlStateNormal];
+    }
+}
+
+- (void)getAlarmMessageList
+{
+    [NetAction getMessage:^(NSArray *result) {
+        NSMutableArray *annotations = [NSMutableArray array];
+        NSMutableArray *messageLists = [NSMutableArray array];
+        AlarmAnnotation *mySendAnnotation;
+        for (NSDictionary *subDic in result) {
+            AlarmAnnotation *annotation = [[AlarmAnnotation alloc] init];
+            CLLocationCoordinate2D coordinate2D;
+            coordinate2D.latitude = [[subDic objectForKey:@"lat"] doubleValue];
+            coordinate2D.longitude = [[subDic objectForKey:@"lng"] doubleValue];
+            annotation.coordinate = coordinate2D;
+            annotation.title = [subDic objectForKey:@"location"];
+            annotation.subtitle = [subDic objectForKey:@"content"];
+            [annotations addObject:annotation];
+            
+            RTMessageAdapter *adapter = [[RTMessageAdapter alloc] init];
+            adapter.addressText = [subDic objectForKey:@"location"];
+            adapter.messageText = [subDic objectForKey:@"content"];
+            adapter.distanceText = [subDic objectForKey:@"distanceStr"];
+            if ([[subDic objectForKey:@"tid"] isEqualToString:[UserInfo shareUserInfo].tid]) {
+                if (coordinate2D.latitude == [UserInfo shareUserInfo].policeCoordinate2D.latitude && coordinate2D.longitude == [UserInfo shareUserInfo].policeCoordinate2D.longitude) {
+                    mySendAnnotation = annotation;
+                }
+            }
+            [messageLists addObject:adapter];
+        }
+        if (self.alarmAnnotations) {
+            [self.mapView removeAnnotations:self.alarmAnnotations];
+        }
+        [self.mapView addAnnotations:annotations];
+        if (mySendAnnotation) {
+            [self.mapView selectAnnotation:mySendAnnotation animated:NO];
+        }
+        self.alarmAnnotations = annotations;
+        
+        self.messageListViewController.listDatas = messageLists;
+        [self.messageListViewController reloadTableView];
+    }];
+}
+
 #pragma mark - setup View
+
+- (void)setupGuidView
+{
+    self.guidViewController = [[RTGuidViewController alloc] initWithNibName:@"RTGuidViewController" bundle:nil];
+    self.guidViewController.view.frame = self.view.bounds;
+    [self.view addSubview:self.guidViewController.view];
+    self.hasGuidView = NO;
+}
+
+- (void)seupMessageList
+{
+    self.messageListViewController = [[RTMessageListViewController alloc] initWithNibName:@"RTMessageListViewController" bundle:nil];
+    self.messageListViewController.view.top = self.view.height;
+    self.messageListViewController.messageDelegate = self;
+    [self.view addSubview:self.messageListViewController.view];
+}
 
 - (void)setupTextView
 {
     self.sendMessageListViewController = [[RTSendMessageViewController alloc] init];
-    self.sendMessageListViewController.textViewContainerView.top = self.view.height -40;
+    self.sendMessageListViewController.delegate = self;
+    self.sendMessageListViewController.textViewContainerView.top = self.view.height;
     [self.view addSubview:self.sendMessageListViewController.textViewContainerView];
 }
 
@@ -293,11 +384,59 @@ extern Class ActionPaopaoView;
 
 - (void)setupReturnBtn
 {
-    UIButton *btn = [UIButton buttonWithType:UIButtonTypeContactAdd];
-    btn.size = CGSizeMake(30, 30);
-    btn.bottom = 50;
+    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    btn.size = CGSizeMake(46, 46);
+    btn.bottom = self.view.height - self.bottomView.height - 2;
+    btn.left = 2;
     [btn addTarget:self action:@selector(returHome:) forControlEvents:UIControlEventTouchUpInside];
-    [self.bottomView addSubview:btn];
+    [btn setImage:[UIImage imageNamed:@"location_nav"] forState:UIControlStateNormal];
+    [self.view addSubview:btn];
+}
+
+- (void)setupModifyCarBtn
+{
+    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    btn.size = CGSizeMake(47, 47);
+    btn.bottom = self.view.height - self.bottomView.height - 8;
+    btn.right = self.view.width - 8;
+    [btn addTarget:self action:@selector(clickModifyCar:) forControlEvents:UIControlEventTouchUpInside];
+    [btn setImageEdgeInsets:UIEdgeInsetsMake(20, 20, 0, 0)];
+    [btn setImage:[UIImage imageNamed:@"P_button"] forState:UIControlStateNormal];
+    [btn setImage:[UIImage imageNamed:@"P_button_pressed"] forState:UIControlStateHighlighted];
+    [self.view addSubview:btn];
+}
+
+#pragma mark - messagelist delegate
+
+- (void)cancelReportMessage
+{
+    [self.policePoint removeFromSuperview];
+    [self.mapView addAnnotations:self.alarmAnnotations];
+}
+
+- (void)sendReportMessage
+{
+    [self.policePoint removeFromSuperview];
+    if (![self.sendMessageListViewController.textView hasText]) {
+        self.sendMessageListViewController.textView.text = @"条子来了，注意！";
+    }
+    [UserInfo shareUserInfo].message = self.sendMessageListViewController.textView.text;
+    [UserInfo shareUserInfo].policeCoordinate2D = [UserInfo shareUserInfo].policeCoordinate2D;
+    [NetAction sendMessage:^(NSDictionary *result) {
+        JMDINFO(@"sendMessage successful");
+        self.sendMessageListViewController.textView.text = @"";
+        [APPDelegate.viewController locationCoordinate2D:[UserInfo shareUserInfo].policeCoordinate2D];
+    }];
+}
+
+- (void)selectMessageList:(NSInteger)index
+{
+    AlarmAnnotation *annotation = [self.alarmAnnotations objectAtIndex:index];
+    CGPoint point =[self.mapView convertCoordinate:annotation.coordinate toPointToView:KeyWindow];
+    CGPoint messagePoint = CGPointMake(point.x, point.y + 40);
+    CLLocationCoordinate2D coord = [self.mapView convertPoint:messagePoint toCoordinateFromView:KeyWindow];
+    [self.mapView setCenterCoordinate:coord];
+    [self.mapView selectAnnotation:annotation animated:NO];
 }
 
 #pragma mark - map delegate
@@ -306,13 +445,21 @@ extern Class ActionPaopaoView;
 {
 	if (error == 0) {
         if ([self.policePoint superview]) {
-            self.sendMessageListViewController.textView.text = [NSString stringWithFormat:@"条子在%@",result.strAddr];
+//            self.sendMessageListViewController.textView.text = [NSString stringWithFormat:@"条子来了注意了！"];
+            self.sendMessageListViewController.addressLabel.text = [NSString stringWithFormat:@"%@",result.strAddr];
+            [UserInfo shareUserInfo].policeLocationName = [NSString stringWithFormat:@"%@",result.strAddr];
         }
         else if([self.carAnnotation superview] == KeyWindow){
             UILabel *titleLabel = [self findPaopaoTitleTextView];
             UILabel *subTitleLabel = [self findPaopaoSubTitleTextView];
             titleLabel.text = @"汽车的位置";
-            NSString *address = [NSString stringWithFormat:@"%@%@%@",result.addressComponent.district,result.addressComponent.streetName,result.addressComponent.streetNumber];
+            NSString *address;
+            if (result.addressComponent.streetNumber) {
+                address = [NSString stringWithFormat:@"%@%@%@",result.addressComponent.district,result.addressComponent.streetName,result.addressComponent.streetNumber];
+            }
+            else{
+                address = [NSString stringWithFormat:@"%@%@",result.addressComponent.district,result.addressComponent.streetName];
+            }
             subTitleLabel.text = address;
         }
 	}
@@ -325,13 +472,12 @@ extern Class ActionPaopaoView;
 {
     CLLocation *newLocation = userLocation.location;
     NSTimeInterval locationAge = -[newLocation.timestamp timeIntervalSinceNow];
-    
     if (locationAge > 5.0) return;
-    if (newLocation.horizontalAccuracy < 0) return;
+    if (newLocation.horizontalAccuracy < 0 || newLocation.horizontalAccuracy > 100) return;
     if (userLocation != nil) {
         CLLocationCoordinate2D oldCoordinate2D = [UserInfo shareUserInfo].myCoordinate2D;
         CLLocation *oldLocation = [[CLLocation alloc] initWithLatitude:oldCoordinate2D.latitude longitude:oldCoordinate2D.longitude];
-        if ([oldLocation distanceFromLocation:newLocation] > 500) {
+        if ([oldLocation distanceFromLocation:newLocation] > 100) {
             JMDINFO(@"%f %f", userLocation.location.coordinate.latitude, userLocation.location.coordinate.longitude);
             [UserInfo shareUserInfo].myCoordinate2D = userLocation.location.coordinate;
         }
@@ -344,24 +490,9 @@ extern Class ActionPaopaoView;
 	
 }
 
-- (void)mapView:(BMKMapView *)mapView didFailToLocateUserWithError:(NSError *)error
-{
-	if (error != nil)
-		JMDINFO(@"locate failed: %@", [error localizedDescription]);
-	else {
-		JMDINFO(@"locate failed");
-	}
-	
-}
-
-- (void)mapViewWillStartLocatingUser:(BMKMapView *)mapView
-{
-	JMDINFO(@"start locate");
-}
-
 - (BMKAnnotationView *)mapView:(BMKMapView *)mapView viewForAnnotation:(id <BMKAnnotation>)annotation
 {
-	if ([annotation isKindOfClass:[BMKPointAnnotation class]]) {
+    if ([annotation isKindOfClass:[BMKPointAnnotation class]]) {
 		BMKAnnotationView *newAnnotation = [[BMKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"myAnnotation"];
         UIImage *carImage = [UIImage imageNamed:@"map_car_icon"];
         newAnnotation.size = carImage.size;
@@ -371,8 +502,9 @@ extern Class ActionPaopaoView;
         newAnnotation.centerOffset = CGPointMake(0, -carImage.size.height/2);
         
         UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
-        btn.size = [UIImage imageNamed:@"map_move"].size;
-        [btn setBackgroundImage:[UIImage imageNamed:@"map_move"] forState:UIControlStateNormal];
+        btn.size = CGSizeMake([UIImage imageNamed:@"map_move"].size.width*2, [UIImage imageNamed:@"map_move"].size.height*2);
+        [btn setImageEdgeInsets:UIEdgeInsetsMake(btn.height/4, btn.width/4, btn.height/4, btn.height/4)];
+        [btn setImage:[UIImage imageNamed:@"map_move"] forState:UIControlStateNormal];
         [btn addTarget:self action:@selector(modifyLocation:) forControlEvents:UIControlEventTouchUpInside];
         newAnnotation.rightCalloutAccessoryView = btn;
         
@@ -396,33 +528,24 @@ extern Class ActionPaopaoView;
 
 - (void)mapView:(BMKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
 {
+    if ([self.sendMessageListViewController.textView isFirstResponder]) {
+        [self.mapView removeAnnotations:self.alarmAnnotations];
+        if ([self.policePoint superview]) {
+            [self findPolicePosition];
+        }
+        return;
+    }
+    if (self.messageListViewController.view.top != self.view.height) {
+        return;
+    }
     CLLocationCoordinate2D topLeft = [self.mapView convertPoint:CGPointZero toCoordinateFromView:self.mapView];
     CLLocationCoordinate2D bottomRight = [self.mapView convertPoint:CGPointMake(self.mapView.width, self.mapView.height-self.bottomView.height) toCoordinateFromView:self.mapView];
+
     [UserInfo shareUserInfo].mapTopLeftLat = [NSNumber numberWithDouble:topLeft.latitude];
     [UserInfo shareUserInfo].mapTopLeftLng = [NSNumber numberWithDouble:topLeft.longitude];
     [UserInfo shareUserInfo].mapBottomRightLat = [NSNumber numberWithDouble:bottomRight.latitude];
     [UserInfo shareUserInfo].mapBottomRightLng = [NSNumber numberWithDouble:bottomRight.longitude];
-    [NetAction getMessage:^(NSArray *result) {
-        NSMutableArray *annotations = [NSMutableArray array];
-        for (NSDictionary *subDic in result) {
-            AlarmAnnotation *annotation = [[AlarmAnnotation alloc] init];
-            CLLocationCoordinate2D coordinate2D;
-            coordinate2D.latitude = [[subDic objectForKey:@"lat"] doubleValue];
-            coordinate2D.longitude = [[subDic objectForKey:@"lng"] doubleValue];
-            annotation.coordinate = coordinate2D;
-            annotation.title = @"Alarm";
-            annotation.subtitle = [subDic objectForKey:@"content"];
-            [annotations addObject:annotation];
-        }
-        if (self.alarmAnnotations) {
-            [self.mapView removeAnnotations:self.alarmAnnotations];
-        }
-        [self.mapView addAnnotations:annotations];
-        self.alarmAnnotations = annotations;
-    }];
-    if ([self.policePoint superview]) {
-        [self findPolicePosition];
-    }
+    [self getAlarmMessageList];
     if ([self.carAnnotation superview] == KeyWindow) {
         [self findCarPosition];
     }
@@ -449,6 +572,38 @@ extern Class ActionPaopaoView;
 
 #pragma mark - btn event
 
+- (IBAction)showMessageList:(id)sender
+{
+    if (self.messageListViewController.view.top == self.view.height) {
+        [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
+        [UIView animateWithDuration:0.25 animations:^{
+            self.messageListViewController.view.bottom = self.view.height - 50;
+        } completion:^(BOOL finished) {
+            [MaskView showMaskInView:self.mapView backgroundColor:[[UIColor blackColor] colorWithAlphaComponent:0.3] size:CGSizeMake(self.mapView.width,self.messageListViewController.view.top) removeMask:^{
+                [self showMessageList:nil];
+            }];
+        }];
+
+        [self checkMessageList];
+    }
+    else{
+        [UIView animateWithDuration:0.25 animations:^{
+            self.messageListViewController.view.top = self.view.height;
+        }];
+        [MaskView removeMaskInView:self.mapView];
+        [self mapView:self.mapView regionDidChangeAnimated:NO];
+    }
+}
+
+- (void)clickModifyCar:(id)sender
+{
+    if (!hasOpenLadar) {
+        return;
+    }
+    [self.mapView setCenterCoordinate:self.carAnnotation.annotation.coordinate];
+    [self.mapView selectAnnotation:self.carAnnotation.annotation animated:NO];
+}
+
 - (void)modifyLocation:(id)sender
 {
     if ([self.carAnnotation superview] == KeyWindow) {
@@ -456,7 +611,7 @@ extern Class ActionPaopaoView;
     }
     else{
         [self addModifyStatusPoint];
-        [self.modifyBtn setBackgroundImage:[UIImage imageNamed:@"map_stop"] forState:UIControlStateNormal];
+        [self.modifyBtn setImage:[UIImage imageNamed:@"map_stop"] forState:UIControlStateNormal];
     }
 }
 
@@ -514,13 +669,18 @@ extern Class ActionPaopaoView;
 - (IBAction)sendMessage:(id)sender
 {
 
-    if (self.sendMessageListViewController.textViewContainerView.bottom == self.view.height) {
+    if (self.messageListViewController.view.top != self.view.height) {
+        [self showMessageList:nil];
+        return;
+    }
+    if (self.sendMessageListViewController.textViewContainerView.top == self.view.height) {
         [self.sendMessageListViewController.textView becomeFirstResponder];
+        [self.mapView removeAnnotations:self.alarmAnnotations];
         BMKCoordinateRegion region;
         region.span.latitudeDelta = 0.00001*self.view.width;
         region.span.longitudeDelta = 0.00001*self.view.height;
         CLLocationCoordinate2D location = [UserInfo shareUserInfo].myCoordinate2D;
-        location.latitude = location.latitude - 0.001;
+        location.latitude = location.latitude - 0.002;
         region.center = location;
         [self.mapView setRegion:region animated:NO];
         [self.mapView regionThatFits:region];
@@ -541,24 +701,25 @@ extern Class ActionPaopaoView;
 
 #pragma mark - Add Observer
 
--(void) keyboardWillHide:(NSNotification *)note
-{
-    [self.policePoint removeFromSuperview];
-}
+//-(void) keyboardWillHide:(NSNotification *)note
+//{
+//    [self.policePoint removeFromSuperview];
+//    [self.mapView addAnnotations:self.alarmAnnotations];
+//}
 
 - (void)synChangeKey
 {
     [[UserInfo shareUserInfo] addObserver:self forKeyPath:@"myCoordinate2D" options:NSKeyValueObservingOptionNew context:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardWillHide:)
-                                                 name:UIKeyboardWillHideNotification
-                                               object:nil];
+//    [[NSNotificationCenter defaultCenter] addObserver:self
+//                                             selector:@selector(keyboardWillHide:)
+//                                                 name:UIKeyboardWillHideNotification
+//                                               object:nil];
 }
 
 - (void)removeSynChangeKey
 {
     [[UserInfo shareUserInfo] removeObserver:self forKeyPath:@"myCoordinate2D"];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
+//    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
 }
 
 
@@ -566,6 +727,12 @@ extern Class ActionPaopaoView;
     [self setLadarIndicator:nil];
     [self setBottomView:nil];
     [self setLadarBtn:nil];
+    [self setMessageBtn:nil];
+    self.mapView = nil;
+    self.carAnnotation = nil;
+    self.policePoint = nil;
+    self.purpleView = nil;
+    self.modifyBtn = nil;
     [super viewDidUnload];
 }
 @end

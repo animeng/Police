@@ -19,6 +19,7 @@ typedef void (^CompletBlock)(NSInteger buttonIndex);
 +(void)removeNetLoadingStatusBar;
 
 +(void)showAlertComplete:(CompletBlock)complete withTitle:(NSString*)title message:(NSString*)message buttonTiles:(NSString *)otherButtonTitles, ...;
++(void)showAlertComplete:(CompletBlock)complete withTitle:(NSString*)title message:(NSString*)message;
 
 + (void)showPromptViewInBottom:(UIView*)subView delayRemove:(CGFloat)time complete:(void (^)(void))complete;
 + (void)removePromptViewInBottom;

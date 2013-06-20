@@ -31,6 +31,14 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     RTFirstViewController *viewController1 = [[RTFirstViewController alloc] initWithNibName:@"RTFirstViewController" bundle:nil];
     self.viewController = viewController1;
+    
+    if (![UserInfo shareUserInfo].tid) {
+        self.viewController.hasGuidView = YES;
+    }
+    else{
+        [self.viewController setHasGuidView:YES];
+    }
+    
     self.window.rootViewController = viewController1;
     [self.window makeKeyAndVisible];
     
@@ -56,16 +64,40 @@
 {
     if ([UserInfo shareUserInfo].tid) {
         [NetAction logon:^(NSDictionary *result) {
-            JMDINFO(@"logon successful");
+            NSString *updateKey = [result objectForKey:@"update"];
+            if (![updateKey isEqualToString:@"NONE"]) {
+                if ([updateKey isEqualToString:@"OPTIONAL"]) {
+                    [UtilityWidget showAlertComplete:^(NSInteger buttonIndex) {
+                        if (buttonIndex == 1) {
+                            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[result objectForKey:@"updateUrl"]]];
+                        }
+                    } withTitle:@"温馨提示" message:@"你有新版本更新！" buttonTiles:@"确定"];
+                }
+                else if([updateKey isEqualToString:@"REQUIRED"]){
+                    [UtilityWidget showAlertComplete:^(NSInteger buttonIndex) {
+                        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[result objectForKey:@"updateUrl"]]];
+                    } withTitle:@"确定" message:@"你有新版本更新！"];
+                }
+            }
         }];
     }
     [self.viewController locationCurrent];
     [self.viewController checkLadarStatus];
+    [self.viewController checkMessageList];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     
+}
+
+- (void)applicationDidReceiveMemoryWarning:(UIApplication *)application {
+
+}
+
+
+- (void)dealloc {
+    [self.mapManager stop];
 }
 
 #pragma mark - romate notification
@@ -81,9 +113,7 @@
     }
     if (![UserInfo shareUserInfo].tid) {
         [NetAction initPort:^(NSDictionary *result) {
-            [NetAction logon:^(NSDictionary *result) {
-                JMDINFO(@"logon successful");
-            }];
+
         }];
     }
 }
@@ -96,14 +126,17 @@
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
 {
     JMDINFO(@"didReceiveRemoteNotification:%@",userInfo);
-    application.applicationIconBadgeNumber = 0;
     if (KeyWindow) {
         [UtilityWidget showAlertComplete:^(NSInteger buttonIndex) {
             if (buttonIndex == 1) {
                 CLLocationCoordinate2D coord;
                 coord.latitude = [[userInfo objectForKey:@"lat"] doubleValue];
                 coord.longitude = [[userInfo objectForKey:@"lng"] doubleValue];
+                application.applicationIconBadgeNumber = -1;
                 [self.viewController locationCoordinate2D:coord];
+            }
+            else{
+                [self.viewController checkMessageList];
             }
         } withTitle:@"警告" message:@"条子来了！！！" buttonTiles:@"确定"];
     }

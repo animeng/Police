@@ -8,9 +8,20 @@
 
 #import "BaseCell.h"
 
+@interface BaseCell()
+
+@property (nonatomic,strong) BaseAdapterContent *adapterContent;
+
+@end
+
 @implementation BaseCell
 
 +(CGFloat)heightOfCell
+{
+    return 200;
+}
+
++(CGFloat)heightOfCell:(BaseAdapterContent*)content
 {
     return 200;
 }
@@ -19,17 +30,28 @@
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
-        [self layoutCustomSubViews];
+        
     }
     return self;
 }
 
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated
+- (void)setContent:(BaseAdapterContent*)content
 {
-    [super setSelected:selected animated:animated];
+    self.adapterContent = content;
+    if (self.adapterContent) {
+        [self layoutCustomSubViews:self.adapterContent];
+    }
+    else{
+        [self layoutCustomSubViews];
+    }
 }
 
 - (void)layoutCustomSubViews
+{
+    
+}
+
+- (void)layoutCustomSubViews:(BaseAdapterContent*)content
 {
     
 }

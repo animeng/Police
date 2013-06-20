@@ -81,8 +81,11 @@
     if ([UserInfo shareUserInfo].carLng) {
         [para setObject:[NSNumber numberWithDouble:[UserInfo shareUserInfo].policeCoordinate2D.longitude] forKey:@"lng"];
     }
+    if ([UserInfo shareUserInfo].policeLocationName) {
+        [para setObject:[UserInfo shareUserInfo].policeLocationName forKey:@"location"];
+    }
     action.parameter = para;
-    [action getRequestDictionaryResult:^(NSDictionary *result) {
+    [action postRequestDictionaryResult:^(NSDictionary *result) {
         info(result);
         
     } error:^(NSError *error) {

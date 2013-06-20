@@ -16,4 +16,8 @@
 
 - (void)checkLadarStatus;
 
+- (void)checkMessageList;
+
+@property (nonatomic,assign) BOOL hasGuidView;
+
 @end

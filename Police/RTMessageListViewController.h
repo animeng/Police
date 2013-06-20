@@ -8,6 +8,14 @@
 
 #import "JMBaseListViewController.h"
 
+@protocol RTMessageListViewControllerDelegate <NSObject>
+
+- (void)selectMessageList:(NSInteger)index;
+
+@end
+
 @interface RTMessageListViewController : JMBaseListViewController
+
+@property (nonatomic,assign) id<RTMessageListViewControllerDelegate> messageDelegate;
 
 @end

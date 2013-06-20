@@ -20,6 +20,8 @@
 
 @property (nonatomic,strong) NSString *message;
 
+@property (nonatomic,strong) NSString *policeLocationName;
+
 @property (nonatomic,assign) CLLocationCoordinate2D myCoordinate2D;
 
 @property (nonatomic,assign) CLLocationCoordinate2D policeCoordinate2D;

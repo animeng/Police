@@ -52,4 +52,6 @@
 
 #define PromptViewTag       889
 
+#define GuidViewTag 890
+
 #endif

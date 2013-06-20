@@ -12,6 +12,9 @@
 #import "MBProgressHUD.h"
 #import "UtilityWidget.h"
 
+extern NSArray * AFQueryStringPairsFromDictionary(NSDictionary *dictionary);
+@class AFQueryStringPair;
+
 @interface JMBasicAction()
 
 @property (nonatomic,retain) JMClient *client;
@@ -73,6 +76,7 @@
         return;
     }
     JMDINFO(@"post request:%@/%@ para:%@",self.client.baseURL,self.basicPath,self.parameter);
+    
     [self.client postPath:self.basicPath parameters:self.parameter success:^(AFHTTPRequestOperation *operation, id responseObject) {
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             info((NSDictionary*)responseObject);

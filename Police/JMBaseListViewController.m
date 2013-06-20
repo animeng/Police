@@ -42,6 +42,7 @@
     
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
+    self.tableView.backgroundColor = [UIColor clearColor];
     [self.view addSubview:self.tableView];
 }
 
@@ -50,7 +51,10 @@
     self.tipLabel = [[UILabel alloc] initWithFrame:self.tableView.bounds];
     self.tipLabel.textAlignment = NSTextAlignmentCenter;
     self.tipLabel.backgroundColor = [UIColor clearColor];
+    self.tipLabel.textColor = [UIColor whiteColor];
+    self.tipLabel.numberOfLines = 0;
     self.tipLabel.text = self.noMessageTips;
+    [self.tableView addSubview:self.tipLabel];
 }
 
 #pragma mark - Table view data source
@@ -89,6 +93,12 @@
 }
 
 #pragma mark - public method
+
+- (void)setNoMessageTips:(NSString *)noMessageTips
+{
+    _noMessageTips = noMessageTips;
+    self.tipLabel.text = noMessageTips;
+}
 
 - (void)reloadTableView
 {

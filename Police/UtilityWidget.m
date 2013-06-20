@@ -48,6 +48,7 @@
     
     JMDINFO(@"add %@",statusBar);
     [statusBar release];
+    [label release];
     [indicatorView release];
     
 }
@@ -132,6 +133,18 @@
                                                    delegate:widget
                                           cancelButtonTitle:@"取消"
                                           otherButtonTitles:otherButtonTitles,nil];
+    [alert show];
+}
+
++(void)showAlertComplete:(CompletBlock)complete withTitle:(NSString*)title message:(NSString*)message
+{
+    UtilityWidget * widget = [[UtilityWidget alloc] init];
+    widget.completeBlock = complete;
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title
+                                                    message:message
+                                                   delegate:widget
+                                          cancelButtonTitle:@"确定"
+                                          otherButtonTitles:nil];
     [alert show];
 }
 

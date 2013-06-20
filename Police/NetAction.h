@@ -14,9 +14,9 @@
 
 + (void) logon:(void (^)(NSDictionary *result))info;
 
-+ (void)sendMessage:(void (^)(NSDictionary *reuslt))info;
++ (void)sendMessage:(void (^)(NSDictionary *result))info;
 
-+ (void)getMessage:(void (^)(NSArray *reuslt))info;
++ (void)getMessage:(void (^)(NSArray *result))info;
 
 + (void)changeStatus:(void (^)(NSDictionary *reuslt))info status:(NSString*)status;
 
