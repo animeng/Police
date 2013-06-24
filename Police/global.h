@@ -35,14 +35,14 @@
 
 #define isIphone5 [[UIScreen mainScreen] bounds].size.height>480
 
-#define hasOpenLadar [[UserInfo shareUserInfo].status isEqualToString:@"true"]
+#define hasOpenLadar [[UserInfo shareUserInfo].status boolValue]
 
 #define openLocalLadar() {\
-[UserInfo shareUserInfo].status = @"true";\
+[UserInfo shareUserInfo].status = [NSNumber numberWithBool:TRUE];\
 }
 
 #define closeLocalLadar() {\
-[UserInfo shareUserInfo].status = @"false";\
+[UserInfo shareUserInfo].status = [NSNumber numberWithBool:FALSE];\
 }
 
 

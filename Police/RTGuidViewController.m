@@ -7,6 +7,7 @@
 //
 
 #import "RTGuidViewController.h"
+#import "MaskView.h"
 
 @interface RTGuidViewController ()
 @property (strong, nonatomic) IBOutlet UIImageView *upImageView;
@@ -49,6 +50,18 @@
         self.downImageView.top = self.view.height;
     } completion:^(BOOL finished) {
         [self.view removeFromSuperview];
+        UIImageView *imageView = [[UIImageView alloc] initWithFrame:KeyWindow.bounds];
+        UIImage *image;
+        if (isIphone5) {
+            image = [UIImage imageNamed:@"guid_iPhone5"];
+        }
+        else{
+            image = [UIImage imageNamed:@"guid_iPhone4"];
+        }
+        imageView.image = image;
+        [MaskView showMaskInView:KeyWindow maskView:imageView removeMask:^{
+            ;
+        }];
     }];
 }
 @end

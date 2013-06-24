@@ -35,6 +35,9 @@
 		E410017E174A140600CE3092 /* UIView+AnimationAddition.m in Sources */ = {isa = PBXBuildFile; fileRef = E410017A174A140600CE3092 /* UIView+AnimationAddition.m */; };
 		E410017F174A140600CE3092 /* NSString+Addition.m in Sources */ = {isa = PBXBuildFile; fileRef = E410017C174A140600CE3092 /* NSString+Addition.m */; };
 		E4100185174A148300CE3092 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = E4100184174A148300CE3092 /* MBProgressHUD.m */; };
+		E4132F521777EC5200E703F6 /* guid_iPhone4@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E4132F501777EC5200E703F6 /* guid_iPhone4@2x.png */; };
+		E4132F531777EC5200E703F6 /* guid_iPhone5@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E4132F511777EC5200E703F6 /* guid_iPhone5@2x.png */; };
+		E4132F5517781EA400E703F6 /* police_avatar@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E4132F5417781EA400E703F6 /* police_avatar@2x.png */; };
 		E413436C175C8A6C00802E38 /* UtilityWidget.m in Sources */ = {isa = PBXBuildFile; fileRef = E413436B175C8A6C00802E38 /* UtilityWidget.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		E419B85B175DBF6000681289 /* HPGrowingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E419B858175DBF6000681289 /* HPGrowingTextView.m */; };
 		E419B85C175DBF6000681289 /* HPTextViewInternal.m in Sources */ = {isa = PBXBuildFile; fileRef = E419B85A175DBF6000681289 /* HPTextViewInternal.m */; };
@@ -47,9 +50,7 @@
 		E419B873175DE18D00681289 /* middle_ radar_on@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E419B871175DE18D00681289 /* middle_ radar_on@2x.png */; };
 		E419B87A175DE21F00681289 /* alarm_button@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E419B874175DE21F00681289 /* alarm_button@2x.png */; };
 		E419B87B175DE21F00681289 /* msg_button@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E419B875175DE21F00681289 /* msg_button@2x.png */; };
-		E419B87C175DE21F00681289 /* header_bg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E419B876175DE21F00681289 /* header_bg@2x.png */; };
 		E419B87D175DE21F00681289 /* light_icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E419B877175DE21F00681289 /* light_icon@2x.png */; };
-		E419B87E175DE21F00681289 /* self_icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E419B878175DE21F00681289 /* self_icon@2x.png */; };
 		E419B87F175DE21F00681289 /* toolbar_bg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E419B879175DE21F00681289 /* toolbar_bg@2x.png */; };
 		E41C328E175E0D2D00F9D8A0 /* middle_button_off@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E41C328D175E0D2D00F9D8A0 /* middle_button_off@2x.png */; };
 		E43003F6174FAB5900D9B2EE /* UserInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = E43003F5174FAB5900D9B2EE /* UserInfo.m */; };
@@ -145,6 +146,9 @@
 		E410017C174A140600CE3092 /* NSString+Addition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Addition.m"; sourceTree = "<group>"; };
 		E4100183174A148300CE3092 /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBProgressHUD.h; sourceTree = "<group>"; };
 		E4100184174A148300CE3092 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
+		E4132F501777EC5200E703F6 /* guid_iPhone4@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "guid_iPhone4@2x.png"; sourceTree = "<group>"; };
+		E4132F511777EC5200E703F6 /* guid_iPhone5@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "guid_iPhone5@2x.png"; sourceTree = "<group>"; };
+		E4132F5417781EA400E703F6 /* police_avatar@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "police_avatar@2x.png"; sourceTree = "<group>"; };
 		E413436A175C8A6C00802E38 /* UtilityWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UtilityWidget.h; sourceTree = "<group>"; };
 		E413436B175C8A6C00802E38 /* UtilityWidget.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UtilityWidget.m; sourceTree = "<group>"; };
 		E419B857175DBF6000681289 /* HPGrowingTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HPGrowingTextView.h; sourceTree = "<group>"; };
@@ -163,9 +167,7 @@
 		E419B871175DE18D00681289 /* middle_ radar_on@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "middle_ radar_on@2x.png"; sourceTree = "<group>"; };
 		E419B874175DE21F00681289 /* alarm_button@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "alarm_button@2x.png"; sourceTree = "<group>"; };
 		E419B875175DE21F00681289 /* msg_button@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "msg_button@2x.png"; sourceTree = "<group>"; };
-		E419B876175DE21F00681289 /* header_bg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "header_bg@2x.png"; sourceTree = "<group>"; };
 		E419B877175DE21F00681289 /* light_icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "light_icon@2x.png"; sourceTree = "<group>"; };
-		E419B878175DE21F00681289 /* self_icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "self_icon@2x.png"; sourceTree = "<group>"; };
 		E419B879175DE21F00681289 /* toolbar_bg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "toolbar_bg@2x.png"; sourceTree = "<group>"; };
 		E41C328D175E0D2D00F9D8A0 /* middle_button_off@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "middle_button_off@2x.png"; sourceTree = "<group>"; };
 		E43003F4174FAB5900D9B2EE /* UserInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserInfo.h; sourceTree = "<group>"; };
@@ -451,6 +453,9 @@
 		E4100182174A145D00CE3092 /* Resource */ = {
 			isa = PBXGroup;
 			children = (
+				E4132F5417781EA400E703F6 /* police_avatar@2x.png */,
+				E4132F501777EC5200E703F6 /* guid_iPhone4@2x.png */,
+				E4132F511777EC5200E703F6 /* guid_iPhone5@2x.png */,
 				E4518F5E1771DD3000DBEF95 /* cancel_button_pressed@2x.png */,
 				E4518F5F1771DD3000DBEF95 /* cancel_button@2x.png */,
 				E4518F581771D84C00DBEF95 /* P_button_pressed@2x.png */,
@@ -465,9 +470,7 @@
 				E48F6C06176342A400F1A822 /* alarm_button_pressed@2x.png */,
 				E419B875175DE21F00681289 /* msg_button@2x.png */,
 				E48F6C04176341E300F1A822 /* msg_button_pressed@2x.png */,
-				E419B876175DE21F00681289 /* header_bg@2x.png */,
 				E419B877175DE21F00681289 /* light_icon@2x.png */,
-				E419B878175DE21F00681289 /* self_icon@2x.png */,
 				E419B879175DE21F00681289 /* toolbar_bg@2x.png */,
 				E41C328D175E0D2D00F9D8A0 /* middle_button_off@2x.png */,
 				E4D69764175F797300833BD6 /* map_stop@2x.png */,
@@ -626,9 +629,7 @@
 				E419B873175DE18D00681289 /* middle_ radar_on@2x.png in Resources */,
 				E419B87A175DE21F00681289 /* alarm_button@2x.png in Resources */,
 				E419B87B175DE21F00681289 /* msg_button@2x.png in Resources */,
-				E419B87C175DE21F00681289 /* header_bg@2x.png in Resources */,
 				E419B87D175DE21F00681289 /* light_icon@2x.png in Resources */,
-				E419B87E175DE21F00681289 /* self_icon@2x.png in Resources */,
 				E419B87F175DE21F00681289 /* toolbar_bg@2x.png in Resources */,
 				E41C328E175E0D2D00F9D8A0 /* middle_button_off@2x.png in Resources */,
 				E4D69766175F797400833BD6 /* map_stop@2x.png in Resources */,
@@ -653,6 +654,9 @@
 				E48D99B3177299AC00E4801B /* guid_up_page@2x.png in Resources */,
 				E48D99B51772D8FC00E4801B /* Icon.png in Resources */,
 				E48D99B71772D90100E4801B /* Icon@2x.png in Resources */,
+				E4132F521777EC5200E703F6 /* guid_iPhone4@2x.png in Resources */,
+				E4132F531777EC5200E703F6 /* guid_iPhone5@2x.png in Resources */,
+				E4132F5517781EA400E703F6 /* police_avatar@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -736,8 +740,8 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Yimeng Wang (B7SWW37H85)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Yimeng Wang (B7SWW37H85)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Yimeng Wang (39453QM9H9)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Yimeng Wang (39453QM9H9)";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -753,8 +757,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-all_load";
-				PROVISIONING_PROFILE = "F10B8A3E-3FC9-422E-8B43-73378983DD28";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "F10B8A3E-3FC9-422E-8B43-73378983DD28";
+				PROVISIONING_PROFILE = "9C549BBA-EC6E-4994-B75E-68531FC98CC1";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "9C549BBA-EC6E-4994-B75E-68531FC98CC1";
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -771,8 +775,8 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Yimeng Wang (B7SWW37H85)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Yimeng Wang (39453QM9H9)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Yimeng Wang (39453QM9H9)";
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -781,7 +785,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				OTHER_LDFLAGS = "-all_load";
-				PROVISIONING_PROFILE = "F10B8A3E-3FC9-422E-8B43-73378983DD28";
+				PROVISIONING_PROFILE = "9C549BBA-EC6E-4994-B75E-68531FC98CC1";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "B65BCDA8-786A-4B94-A181-04D17CC4C883";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -790,8 +795,8 @@
 		E410014A174A0CFC00CE3092 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer: Yimeng Wang (B7SWW37H85)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Yimeng Wang (B7SWW37H85)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Yimeng Wang (39453QM9H9)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Yimeng Wang (39453QM9H9)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Police/Police-Prefix.pch";
 				INFOPLIST_FILE = "Police/Police-Info.plist";
@@ -800,8 +805,8 @@
 					"\"$(SRCROOT)/Police\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "F10B8A3E-3FC9-422E-8B43-73378983DD28";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "F10B8A3E-3FC9-422E-8B43-73378983DD28";
+				PROVISIONING_PROFILE = "B65BCDA8-786A-4B94-A181-04D17CC4C883";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "9C549BBA-EC6E-4994-B75E-68531FC98CC1";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -809,7 +814,7 @@
 		E410014B174A0CFC00CE3092 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer: Yimeng Wang (B7SWW37H85)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Yimeng Wang (39453QM9H9)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Police/Police-Prefix.pch";
 				INFOPLIST_FILE = "Police/Police-Info.plist";
@@ -818,7 +823,7 @@
 					"\"$(SRCROOT)/Police\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "F10B8A3E-3FC9-422E-8B43-73378983DD28";
+				PROVISIONING_PROFILE = "B65BCDA8-786A-4B94-A181-04D17CC4C883";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

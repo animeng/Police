@@ -53,6 +53,19 @@
     [view addSubview:mask];
 }
 
++(void)showMaskInView:(UIView*)view maskView:(UIView*)maskView removeMask:(RemoveBlock)block
+{
+    if ([view viewWithTag:GuidViewTag]) {
+        return;
+    }
+    MaskView *mask = [[MaskView alloc] initWithFrame:view.bounds];
+    maskView.bounds = mask.bounds;
+    [mask addSubview:maskView];
+    mask.removeMaskBlock = block;
+    mask.tag = GuidViewTag;
+    [view addSubview:mask];
+}
+
 + (void)removeMaskInView:(UIView*)view
 {
     for (UIView *subView in view.subviews) {

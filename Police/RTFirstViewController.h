@@ -20,4 +20,6 @@
 
 @property (nonatomic,assign) BOOL hasGuidView;
 
+@property (nonatomic,assign) CLLocationCoordinate2D needShowCoordinate2D;
+
 @end

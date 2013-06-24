@@ -20,6 +20,10 @@
 
 @synthesize status = _status;
 
+@synthesize carLat = _carLat;
+
+@synthesize carLng = _carLng;
+
 @synthesize pushToken = _pushToken;
 
 + (UserInfo*)shareUserInfo
@@ -73,13 +77,51 @@
     return @"";
 }
 
+- (void)setCarLat:(NSNumber *)carLat
+{
+    _carLat = carLat;
+    if (carLat) {
+        [self.userDefaults setObject:carLat forKey:@"carLat"];
+    }
+    else{
+        [self.userDefaults removeObjectForKey:@"carLat"];
+    }
+}
+
+- (NSNumber*)carLat
+{
+    if (!_carLat) {
+        _carLat = [self.userDefaults objectForKey:@"carLat"];
+    }
+    return _carLat;
+}
+
+- (void)setCarLng:(NSNumber *)carLng
+{
+    _carLng = carLng;
+    if (carLng) {
+        [self.userDefaults setObject:carLng forKey:@"carLng"];
+    }
+    else{
+        [self.userDefaults removeObjectForKey:@"carLng"];
+    }
+}
+
+- (NSNumber*)carLng
+{
+    if (!_carLng) {
+        _carLng = [self.userDefaults objectForKey:@"carLng"];
+    }
+    return _carLng;
+}
+
 
 - (NSString*)type
 {
     return @"iphone";
 }
 
-- (void)setStatus:(NSString *)status
+- (void)setStatus:(NSNumber *)status
 {
     _status = status;
     if (status) {
@@ -88,12 +130,12 @@
     [self.userDefaults synchronize];
 }
 
-- (NSString*)status
+- (NSNumber*)status
 {
     if ([self.userDefaults objectForKey:@"status"]) {
         return [self.userDefaults objectForKey:@"status"];
     }
-    return @"false";
+    return [NSNumber numberWithBool:FALSE];
 }
 
 - (NSString*)version

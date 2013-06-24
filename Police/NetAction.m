@@ -32,6 +32,7 @@
     [action getRequestDictionaryResult:^(NSDictionary *result) {
         NSString *tid = [result objectForKey:@"tid"];
         [UserInfo shareUserInfo].tid = tid;
+        [UserInfo shareUserInfo].status = [result objectForKey:@"status"];
         info(result);
         
     } error:^(NSError *error) {
@@ -56,8 +57,12 @@
     }
     action.parameter = para;
     [action getRequestDictionaryResult:^(NSDictionary *result) {
+        [UserInfo shareUserInfo].status = [result objectForKey:@"status"];
+        if ([result objectForKey:@"lat"]) {
+            [UserInfo shareUserInfo].carLat = [result objectForKey:@"lat"];
+            [UserInfo shareUserInfo].carLng = [result objectForKey:@"lng"];
+        }
         info(result);
-        
     } error:^(NSError *error) {
         
     }];
@@ -98,7 +103,6 @@
     JMBasicAction *action = [[JMBasicAction alloc] init];
     action.basicPath = @"getMessage";
     NSMutableDictionary *para = [NSMutableDictionary dictionary];
-//    NSDictionary *para = @{@"tid": [UserInfo shareUserInfo].tid,@"message":@"afdfdfd",@"lat1":@"30.0",@"lng1":@"120.0",@"lat2":@"29.0",@"lng2":@"121.0"};
     if ([UserInfo shareUserInfo].tid) {
         [para setObject:[UserInfo shareUserInfo].tid forKey:@"tid"];
     }
@@ -144,7 +148,6 @@
     }
     action.parameter = para;
     [action getRequestDictionaryResult:^(NSDictionary *result) {
-        [UserInfo shareUserInfo].status = [result objectForKey:@"status"];
         info(result);
         
     } error:^(NSError *error) {

@@ -16,6 +16,8 @@ typedef void (^RemoveBlock)(void);
 
 +(void)showMaskInView:(UIView*)view backgroundColor:(UIColor*)color size:(CGSize)size removeMask:(RemoveBlock)block;
 
++(void)showMaskInView:(UIView*)view maskView:(UIView*)maskView removeMask:(RemoveBlock)block;
+
 + (void)removeMaskInView:(UIView*)view;
 
 @property (nonatomic,copy) RemoveBlock removeMaskBlock;

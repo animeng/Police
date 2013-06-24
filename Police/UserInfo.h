@@ -16,7 +16,7 @@
 
 @property (nonatomic,strong) NSString *type;
 
-@property (nonatomic,strong) NSString *status;
+@property (nonatomic,strong) NSNumber *status;
 
 @property (nonatomic,strong) NSString *message;
 

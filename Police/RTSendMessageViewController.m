@@ -9,6 +9,7 @@
 #import "RTSendMessageViewController.h"
 #import "UserInfo.h"
 #import "NetAction.h"
+#import "MBProgressHUD.h"
 
 @interface RTSendMessageViewController ()<HPGrowingTextViewDelegate>
 
@@ -126,7 +127,7 @@
     self.textView.contentInset = UIEdgeInsetsMake(0, 5, 0, 5);
     self.textView.backgroundColor = [UIColor clearColor];
 	self.textView.minNumberOfLines = 1;
-	self.textView.maxNumberOfLines = 6;
+	self.textView.maxNumberOfLines = 3;
 	self.textView.returnKeyType = UIReturnKeySend;
 	self.textView.font = [UIFont systemFontOfSize:15.0f];
 	self.textView.delegate = self;
@@ -179,15 +180,25 @@
 	self.textViewContainerView.frame = r;
 }
 
-- (void)growingTextView:(HPGrowingTextView *)growingTextView didChangeHeight:(float)height
-{
-    JMDINFO(@"%f,%f",growingTextView.internalTextView.contentOffset.x,growingTextView.internalTextView.contentOffset.y);
-    [growingTextView.internalTextView setContentOffset:CGPointMake(0, 0)];
-}
+//- (void)growingTextView:(HPGrowingTextView *)growingTextView didChangeHeight:(float)height
+//{
+//    JMDINFO(@"%f,%f",growingTextView.internalTextView.contentOffset.x,growingTextView.internalTextView.contentOffset.y);
+//    [growingTextView.internalTextView setContentOffset:CGPointMake(0, 0)];
+//}
 
 - (BOOL)growingTextViewShouldReturn:(HPGrowingTextView *)growingTextView
 {
-    [self sendText];
+    if ([growingTextView.text length] > 50) {
+        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:KeyWindow animated:YES];
+        hud.mode = MBProgressHUDModeText;
+        hud.labelText = @"你输入的文字不能超过50个！";
+        hud.removeFromSuperViewOnHide = YES;
+        [hud hide:YES afterDelay:3];
+        [self cancelSendText];
+    }
+    else{
+        [self sendText];
+    }
     return YES;
 }
 

@@ -25,8 +25,6 @@ extern Class ActionPaopaoView;
 
 @property (nonatomic,strong) BMKMapView *mapView;
 
-@property (nonatomic,assign) BOOL hasCarPosition;
-
 @property (nonatomic,strong) BMKAnnotationView * carAnnotation;
 
 @property (nonatomic,strong) UIImageView *policePoint;
@@ -84,7 +82,7 @@ extern Class ActionPaopaoView;
     if (self.hasGuidView) {
         [self setupGuidView];
     }
-    [self checkLadarStatus];
+//    [self checkLadarStatus];
 }
 
 - (void)didReceiveMemoryWarning
@@ -92,9 +90,34 @@ extern Class ActionPaopaoView;
     [super didReceiveMemoryWarning];
 }
 
+- (void)viewDidUnload {
+    [self setLadarIndicator:nil];
+    [self setBottomView:nil];
+    [self setLadarBtn:nil];
+    [self setMessageBtn:nil];
+    self.mapView = nil;
+    self.carAnnotation = nil;
+    self.policePoint = nil;
+    self.purpleView = nil;
+    self.modifyBtn = nil;
+    [super viewDidUnload];
+}
+
 - (void)dealloc
 {
     [self removeSynChangeKey];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    self.mapView.delegate = self;
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    self.mapView.delegate = nil;
 }
 
 #pragma mark - private method
@@ -194,10 +217,10 @@ extern Class ActionPaopaoView;
 - (void)addPolicePoint
 {
     if (!self.policePoint) {
-        UIImage *policeImage = [UIImage imageNamed:@"self_icon"];
+        UIImage *policeImage = [UIImage imageNamed:@"police_avatar"];
         self.policePoint = [[UIImageView alloc] initWithImage:policeImage];
         self.policePoint.size = policeImage.size;
-        self.policePoint.center = CGPointMake(KeyWindow.width/2, KeyWindow.height/2-120);
+        self.policePoint.center = CGPointMake(KeyWindow.width/2, KeyWindow.height/2-130);
     }
     if (![self.policePoint superview]) {
         [KeyWindow addSubview:self.policePoint];
@@ -228,11 +251,16 @@ extern Class ActionPaopaoView;
 
 - (void)addCarPoint:(CLLocationCoordinate2D)currentCoordinate2D
 {
+    [UserInfo shareUserInfo].carLat = [NSNumber numberWithDouble:currentCoordinate2D.latitude];
+    [UserInfo shareUserInfo].carLng = [NSNumber numberWithDouble:currentCoordinate2D.longitude];
     // 添加一个PointAnnotation
     BMKPointAnnotation* annotation = [[BMKPointAnnotation alloc]init];
     annotation.coordinate = currentCoordinate2D;
     annotation.title = @"温馨提示";
     annotation.subtitle = @"点击右边按钮移动汽车位置！";
+    if (self.carAnnotation) {
+        [self.mapView removeAnnotation:self.carAnnotation.annotation];
+    }
     [self.mapView addAnnotation:annotation];
 }
 
@@ -268,12 +296,17 @@ extern Class ActionPaopaoView;
 {
     // 添加一个PointAnnotation
     [self addCarPoint:coord];
-    [UserInfo shareUserInfo].carLat = [NSNumber numberWithDouble:coord.latitude];
-    [UserInfo shareUserInfo].carLng = [NSNumber numberWithDouble:coord.longitude];
+    NSString *status;
+    if (hasOpenLadar) {
+        status = @"true";
+    }
+    else{
+        status = @"false";
+    }
     [NetAction changeStatus:^(NSDictionary *reuslt) {
         JMDINFO(@"change status successful");
 
-    } status:[UserInfo shareUserInfo].status];
+    } status:status];
 }
 
 - (void)checkLadarStatus
@@ -291,7 +324,12 @@ extern Class ActionPaopaoView;
     else{
         [self.ladarBtn setBackgroundImage:[UIImage imageNamed:@"middle_button_on"] forState:UIControlStateNormal];
         if (![self.carAnnotation superview]) {
-            [self addCarPoint:[UserInfo shareUserInfo].myCoordinate2D];
+            CLLocationCoordinate2D coordinate2d;
+            if ([UserInfo shareUserInfo].carLat) {
+                coordinate2d.latitude = [[UserInfo shareUserInfo].carLat doubleValue];
+                coordinate2d.longitude = [[UserInfo shareUserInfo].carLng doubleValue];
+                [self addCarPoint:coordinate2d];
+            }
         }
         [self ladarScanAnimation];
     }
@@ -327,10 +365,11 @@ extern Class ActionPaopaoView;
             adapter.addressText = [subDic objectForKey:@"location"];
             adapter.messageText = [subDic objectForKey:@"content"];
             adapter.distanceText = [subDic objectForKey:@"distanceStr"];
-            if ([[subDic objectForKey:@"tid"] isEqualToString:[UserInfo shareUserInfo].tid]) {
-                if (coordinate2D.latitude == [UserInfo shareUserInfo].policeCoordinate2D.latitude && coordinate2D.longitude == [UserInfo shareUserInfo].policeCoordinate2D.longitude) {
-                    mySendAnnotation = annotation;
-                }
+            if (coordinate2D.latitude == self.needShowCoordinate2D.latitude && coordinate2D.longitude == self.needShowCoordinate2D.longitude) {
+                mySendAnnotation = annotation;
+                CLLocationCoordinate2D coordinate2D;
+                coordinate2D.latitude = -1000;
+                self.needShowCoordinate2D = coordinate2D;
             }
             [messageLists addObject:adapter];
         }
@@ -445,9 +484,11 @@ extern Class ActionPaopaoView;
 {
 	if (error == 0) {
         if ([self.policePoint superview]) {
-//            self.sendMessageListViewController.textView.text = [NSString stringWithFormat:@"条子来了注意了！"];
             self.sendMessageListViewController.addressLabel.text = [NSString stringWithFormat:@"%@",result.strAddr];
             [UserInfo shareUserInfo].policeLocationName = [NSString stringWithFormat:@"%@",result.strAddr];
+            if (![self.sendMessageListViewController.textView hasText]) {
+                self.sendMessageListViewController.textView.text = @"#条子来了#";
+            }
         }
         else if([self.carAnnotation superview] == KeyWindow){
             UILabel *titleLabel = [self findPaopaoTitleTextView];
@@ -481,10 +522,9 @@ extern Class ActionPaopaoView;
             JMDINFO(@"%f %f", userLocation.location.coordinate.latitude, userLocation.location.coordinate.longitude);
             [UserInfo shareUserInfo].myCoordinate2D = userLocation.location.coordinate;
         }
-        if (!self.hasCarPosition && hasOpenLadar) {
+        if (![UserInfo shareUserInfo].carLat && hasOpenLadar) {
             // 添加一个PointAnnotation
-            [self modifyLocationCompleted:userLocation.location.coordinate];
-            self.hasCarPosition = YES;
+            [self addCarPoint:userLocation.location.coordinate];
         }
 	}
 	
@@ -507,7 +547,6 @@ extern Class ActionPaopaoView;
         [btn setImage:[UIImage imageNamed:@"map_move"] forState:UIControlStateNormal];
         [btn addTarget:self action:@selector(modifyLocation:) forControlEvents:UIControlEventTouchUpInside];
         newAnnotation.rightCalloutAccessoryView = btn;
-        
 		self.carAnnotation = newAnnotation;
         self.modifyBtn = btn;
         
@@ -528,6 +567,9 @@ extern Class ActionPaopaoView;
 
 - (void)mapView:(BMKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
 {
+    if (![UserInfo shareUserInfo].tid) {
+        return;
+    }
     if ([self.sendMessageListViewController.textView isFirstResponder]) {
         [self.mapView removeAnnotations:self.alarmAnnotations];
         if ([self.policePoint superview]) {
@@ -566,8 +608,6 @@ extern Class ActionPaopaoView;
     region.center = coord;
     [self.mapView setRegion:region animated:NO];
     [self.mapView regionThatFits:region];
-    [self.mapView setCenterCoordinate:coord animated:NO];
-    
 }
 
 #pragma mark - btn event
@@ -598,10 +638,24 @@ extern Class ActionPaopaoView;
 - (void)clickModifyCar:(id)sender
 {
     if (!hasOpenLadar) {
+        [UtilityWidget showAlertComplete:^(NSInteger buttonIndex) {
+            if (buttonIndex == 1) {
+                [self toggleLadar:nil];
+            }
+        } withTitle:@"温馨提示" message:@"请先开启雷达，再进行停车" buttonTiles:@"立即开启雷达"];
         return;
     }
-    [self.mapView setCenterCoordinate:self.carAnnotation.annotation.coordinate];
-    [self.mapView selectAnnotation:self.carAnnotation.annotation animated:NO];
+    if ([self.carAnnotation superview] != KeyWindow) {
+        [self.mapView setCenterCoordinate:self.carAnnotation.annotation.coordinate];
+        [self.mapView selectAnnotation:self.carAnnotation.annotation animated:NO];
+        if (![self.carAnnotation superview]) {
+            [self.mapView setCenterCoordinate:[UserInfo shareUserInfo].myCoordinate2D];
+            [self addCarPoint:[UserInfo shareUserInfo].myCoordinate2D];
+        }
+    }
+    else{
+        [self removeModifyStatusPoint];
+    }
 }
 
 - (void)modifyLocation:(id)sender
@@ -617,20 +671,6 @@ extern Class ActionPaopaoView;
 
 - (void)returHome:(id)sender
 {
-    if (hasOpenLadar &&[self.carAnnotation superview] != KeyWindow) {
-        [UtilityWidget showAlertComplete:^(NSInteger buttonIndex) {
-            if (buttonIndex == 1) {
-                [self.mapView removeAnnotation:self.carAnnotation.annotation];
-                [self modifyLocationCompleted:[UserInfo shareUserInfo].myCoordinate2D];
-
-
-            }
-        }
-                               withTitle:@"温馨提示"
-                                 message:@"你的汽车是否回到当前的位置？"
-                             buttonTiles:@"确定",nil];
-    }
-
     [self locationCurrent];
 }
 
@@ -644,6 +684,10 @@ extern Class ActionPaopaoView;
     else{
         [UtilityWidget showNetLoadingStatusBar:@"正在关闭雷达"];
         status = @"false";
+    }
+    if (![UserInfo shareUserInfo].carLat && [UserInfo shareUserInfo].myCoordinate2D.latitude!=0 && [UserInfo shareUserInfo].myCoordinate2D.longitude != 0) {
+        [UserInfo shareUserInfo].carLat = [NSNumber numberWithDouble:[UserInfo shareUserInfo].myCoordinate2D.latitude];
+        [UserInfo shareUserInfo].carLng = [NSNumber numberWithDouble:[UserInfo shareUserInfo].myCoordinate2D.longitude];
     }
     [NetAction changeStatus:^(NSDictionary *reuslt){
         JMDINFO(@"change status successful");
@@ -663,6 +707,8 @@ extern Class ActionPaopaoView;
                 return;
             }
         }
+        [UserInfo shareUserInfo].carLat = [NSNumber numberWithDouble:[UserInfo shareUserInfo].myCoordinate2D.latitude];
+        [UserInfo shareUserInfo].carLng = [NSNumber numberWithDouble:[UserInfo shareUserInfo].myCoordinate2D.longitude];
         [self checkLadarStatus];
     } status:status];
 }
@@ -673,7 +719,7 @@ extern Class ActionPaopaoView;
         [self showMessageList:nil];
         return;
     }
-    if (self.sendMessageListViewController.textViewContainerView.top == self.view.height) {
+    if (self.sendMessageListViewController.textViewContainerView.top < (self.view.height+self.sendMessageListViewController.textViewContainerView.height)) {
         [self.sendMessageListViewController.textView becomeFirstResponder];
         [self.mapView removeAnnotations:self.alarmAnnotations];
         BMKCoordinateRegion region;
@@ -701,38 +747,14 @@ extern Class ActionPaopaoView;
 
 #pragma mark - Add Observer
 
-//-(void) keyboardWillHide:(NSNotification *)note
-//{
-//    [self.policePoint removeFromSuperview];
-//    [self.mapView addAnnotations:self.alarmAnnotations];
-//}
-
 - (void)synChangeKey
 {
     [[UserInfo shareUserInfo] addObserver:self forKeyPath:@"myCoordinate2D" options:NSKeyValueObservingOptionNew context:nil];
-//    [[NSNotificationCenter defaultCenter] addObserver:self
-//                                             selector:@selector(keyboardWillHide:)
-//                                                 name:UIKeyboardWillHideNotification
-//                                               object:nil];
 }
 
 - (void)removeSynChangeKey
 {
     [[UserInfo shareUserInfo] removeObserver:self forKeyPath:@"myCoordinate2D"];
-//    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
 }
 
-
-- (void)viewDidUnload {
-    [self setLadarIndicator:nil];
-    [self setBottomView:nil];
-    [self setLadarBtn:nil];
-    [self setMessageBtn:nil];
-    self.mapView = nil;
-    self.carAnnotation = nil;
-    self.policePoint = nil;
-    self.purpleView = nil;
-    self.modifyBtn = nil;
-    [super viewDidUnload];
-}
 @end

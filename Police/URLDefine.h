@@ -9,9 +9,9 @@
 #ifndef SaleHouse_URLDefine_h
 #define SaleHouse_URLDefine_h
 
-//#define APIBaseURLString @"http://tiaozilaile.com:80"
+#define APIBaseURLString @"http://tiaozilaile.com:80"
 
-#define APIBaseURLString @"http://imcxin.gicp.net"
+//#define APIBaseURLString @"http://imcxin.gicp.net"
 
 typedef enum REQUEST_ERRO
 {

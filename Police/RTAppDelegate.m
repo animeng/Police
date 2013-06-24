@@ -27,6 +27,7 @@
 	}
     [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
      (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+    [UIApplication sharedApplication].statusBarHidden = NO;
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     RTFirstViewController *viewController1 = [[RTFirstViewController alloc] initWithNibName:@"RTFirstViewController" bundle:nil];
@@ -36,7 +37,7 @@
         self.viewController.hasGuidView = YES;
     }
     else{
-        [self.viewController setHasGuidView:YES];
+        [self.viewController setHasGuidView:NO];
     }
     
     self.window.rootViewController = viewController1;
@@ -64,6 +65,7 @@
 {
     if ([UserInfo shareUserInfo].tid) {
         [NetAction logon:^(NSDictionary *result) {
+            [self.viewController checkLadarStatus];
             NSString *updateKey = [result objectForKey:@"update"];
             if (![updateKey isEqualToString:@"NONE"]) {
                 if ([updateKey isEqualToString:@"OPTIONAL"]) {
@@ -81,8 +83,8 @@
             }
         }];
     }
-    [self.viewController locationCurrent];
-    [self.viewController checkLadarStatus];
+//    [self.viewController locationCurrent];
+//    [self.viewController checkLadarStatus];
     [self.viewController checkMessageList];
 }
 
@@ -126,6 +128,8 @@
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
 {
     JMDINFO(@"didReceiveRemoteNotification:%@",userInfo);
+    NSDictionary *content = [userInfo objectForKey:@"aps"];
+    NSString *alert = [content objectForKey:@"alert"];
     if (KeyWindow) {
         [UtilityWidget showAlertComplete:^(NSInteger buttonIndex) {
             if (buttonIndex == 1) {
@@ -133,12 +137,13 @@
                 coord.latitude = [[userInfo objectForKey:@"lat"] doubleValue];
                 coord.longitude = [[userInfo objectForKey:@"lng"] doubleValue];
                 application.applicationIconBadgeNumber = -1;
+                self.viewController.needShowCoordinate2D = coord;
                 [self.viewController locationCoordinate2D:coord];
             }
             else{
                 [self.viewController checkMessageList];
             }
-        } withTitle:@"警告" message:@"条子来了！！！" buttonTiles:@"确定"];
+        } withTitle:@"条子来了" message:alert buttonTiles:@"确定"];
     }
 }
 
